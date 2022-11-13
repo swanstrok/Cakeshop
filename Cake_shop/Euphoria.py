@@ -9,7 +9,6 @@ start_time = time.time()
 shop_balance = 0
 client_counter = 0
 
-
 def documentation(filename: str):
     """Создание документации"""
     with open(filename) as f:
@@ -75,12 +74,11 @@ def purchaice(production: dict):
     return bill, price
 
 
-def prod(production: dict):
+def prod(production: dict, balance: int):
     """Процесс оплаты товаров"""
     global shop_balance
     global client_counter
-    balance = random.randint(0, 5000)
-    print(f"Мой баланс {balance}")
+
     bill, price = purchaice(production)
     if price > balance:
         print("У вас недостаточно денег.")
@@ -96,25 +94,28 @@ def prod(production: dict):
         bill_client(bill)
         client_counter += 1
         shop_balance += price
+        balance -= price
         with open("prods.json", "w") as f:
             json.dump(production, f, ensure_ascii=False)
     stat = dict()
     stat["количество клиентов"] = client_counter
     stat["прибыль"] = shop_balance
     stats(stat)
-    return shop_balance
+    return  balance
 
 
 def client(production: dict):
     """Приход клиента"""
+    balance = random.randint(0, 5000)
     while True:
-        print("""
+        print(f"""
+Мой баланс {balance}
 Введите для выбора:
 1. Если хотите посмотреть описание;
 2. Если хотите посмотреть цену;
 3. Если хотите посмотреть количество;
-4. Если хотите посмотреть всю информацию;".
-5. Если хотите приступить к покупке;"
+4. Если хотите посмотреть всю информацию;
+5. Если хотите приступить к покупке;
 6. Если хотите выйти из магазина.
 """)
         choice = input("Введите свой выбор:\n").lower()
@@ -129,8 +130,9 @@ def client(production: dict):
             elif choice == "4":
                 print(f"{key} : {value}")
             elif choice == "5":
-                prod(production)
-
+                balance = prod(production, balance)
+                print(balance)
+                break
         if choice == "6":
             break
 
@@ -141,8 +143,8 @@ def admin(production: dict):
 Выберите:
 1 - Для просмотра выручки;
 2 - Для изменения цены на товар;
-3 - Для добавления новой продукции в кондитерскую
-4 - Для удаления продукции с кондитерской
+3 - Для добавления новой продукции в кондитерскую;
+4 - Для удаления продукции с кондитерской.
 """)
     admin_choice = input()
     if admin_choice == '1':
@@ -184,6 +186,7 @@ def main(production: dict):
         admin(production)
     elif role_choice == 'покупатель':
         client(production)
+    return shop_balance, client_counter
 
 
 while (time.time() - start_time) < max_time:
