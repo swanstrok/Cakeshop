@@ -1,0 +1,190 @@
+import datetime
+import time
+import os
+import json
+import random
+
+max_time = 28800
+start_time = time.time()
+shop_balance = 0
+client_counter = 0
+
+
+def documentation(filename: str):
+    """Создание документации"""
+    with open(filename) as f:
+        production = json.load(f)
+
+    return production
+
+
+def bill_client(bill: dict):
+    """Создание чека"""
+    os.chdir('bills')
+    try:
+        os.mkdir(str(datetime.date.today()))
+    except FileExistsError:
+        pass
+    os.chdir(str(datetime.date.today()))
+    with open(f'check №{client_counter}.json', 'w') as f:
+        json.dump(bill, f, ensure_ascii=False)
+    os.chdir('..')
+    os.chdir('..')
+
+
+def stats(stat: dict):
+    """Создание статистики прибыли и количества клиентов за день"""
+    os.chdir('statistics')
+    with open(f'{str(datetime.date.today())}.json', 'w') as f:
+        json.dump(stat, f, ensure_ascii=False)
+    os.chdir('..')
+    return stat
+
+
+def adding(production: dict):
+    """Добавление продуктов в кондитерскую"""
+    count_of_goods = int(input("Введите количество привезенных позиций товаров: "))
+    for i in range(count_of_goods):
+        name = input("Наименование товара: ")
+        quantity = int(input("Количество товара: "))
+        if name in production:
+            production[name][2] += quantity
+    return production
+
+
+def purchaice(production: dict):
+    """Процесс выбора товаров"""
+    price = 0
+    bill = dict()
+    while True:
+        choice_prod = input(
+            "Введите название товара, если ничего не желаете то введите 'n': ").lower()
+        if choice_prod == 'n' or choice_prod not in production:
+            break
+        choice_qti = int(input("Введите количество товара: "))
+        if choice_qti > production[choice_prod][2]:
+            print("У нас нет столько((")
+            continue
+
+        price += production[choice_prod][1] * choice_qti
+        production[choice_prod][2] -= choice_qti
+        bill[choice_prod] = [f"Куплено: {choice_qti}",
+                             f"Стоимость: {production[choice_prod][1] * choice_qti}"]
+
+    bill["итоговая цена"] = price
+    return bill, price
+
+
+def prod(production: dict):
+    """Процесс оплаты товаров"""
+    global shop_balance
+    global client_counter
+    balance = random.randint(0, 5000)
+    print(f"Мой баланс {balance}")
+    bill, price = purchaice(production)
+    if price > balance:
+        print("У вас недостаточно денег.")
+        choice_again = input("Хотите ли вы вернуться к покупкам?(да/нет)\n").lower()
+        if choice_again == 'да':
+            purchaice(production)
+        elif choice_again == 'нет':
+            client(production)
+    else:
+        print(f"Ваш чек:")
+        for i, j in bill.items():
+            print(i, j)
+        bill_client(bill)
+        client_counter += 1
+        shop_balance += price
+        with open("prods.json", "w") as f:
+            json.dump(production, f, ensure_ascii=False)
+    stat = dict()
+    stat["количество клиентов"] = client_counter
+    stat["прибыль"] = shop_balance
+    stats(stat)
+    return shop_balance
+
+
+def client(production: dict):
+    """Приход клиента"""
+    while True:
+        print("""
+Введите для выбора:
+1. Если хотите посмотреть описание;
+2. Если хотите посмотреть цену;
+3. Если хотите посмотреть количество;
+4. Если хотите посмотреть всю информацию;".
+5. Если хотите приступить к покупке;"
+6. Если хотите выйти из магазина.
+""")
+        choice = input("Введите свой выбор:\n").lower()
+
+        for key, value in production.items():
+            if choice == "1":
+                print(f"{key} : {value[0]}")
+            elif choice == "2":
+                print(f"{key} : {value[1]}")
+            elif choice == "3":
+                print(f"{key} : {value[2]}")
+            elif choice == "4":
+                print(f"{key} : {value}")
+            elif choice == "5":
+                prod(production)
+
+        if choice == "6":
+            break
+
+
+def admin(production: dict):
+    """Роль админа"""
+    print("""
+Выберите:
+1 - Для просмотра выручки;
+2 - Для изменения цены на товар;
+3 - Для добавления новой продукции в кондитерскую
+4 - Для удаления продукции с кондитерской
+""")
+    admin_choice = input()
+    if admin_choice == '1':
+        print(f"Выручка магазина: {shop_balance}.")
+    elif admin_choice == '2':
+        good_choice = input("Введите название товара: ")
+        if good_choice in production:
+            price_choice = int(input("Введите новую цену на товар: "))
+            production[good_choice][1] = price_choice
+            print(production)
+    elif admin_choice == '3':
+        good_choice = input("Введите название товара: ")
+        if good_choice not in production:
+            sostav = input("Введите состав товара через запятую: ")
+            cost = int(input("Введите желаемую цену на товар: "))
+
+            production[good_choice] = [None, None, None]
+            production[good_choice][0] = sostav
+            production[good_choice][1] = cost
+            production[good_choice][2] = 0
+            print(production)
+    elif admin_choice == '4':
+        good_choice = input("Введите название товара: ")
+        if good_choice in production:
+            del production[good_choice]
+            print(production)
+    with open("prods.json", "w") as f:
+        json.dump(production, f, ensure_ascii=False)
+
+    return production
+
+
+def main(production: dict):
+    print("Добро пожаловать в кондитерскую!")
+    role_choice = input("Введите свою роль (покупатель/поставщик/администратор): ").lower()
+    if role_choice == 'поставщик':
+        adding(production)
+    elif role_choice == 'администратор':
+        admin(production)
+    elif role_choice == 'покупатель':
+        client(production)
+
+
+while (time.time() - start_time) < max_time:
+    main(documentation('prods.json'))
