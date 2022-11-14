@@ -6,8 +6,7 @@ import random
 
 max_time = 28800
 start_time = time.time()
-shop_balance = 0
-client_counter = 0
+
 
 def documentation(filename: str):
     """Создание документации"""
@@ -19,6 +18,12 @@ def documentation(filename: str):
 
 def bill_client(bill: dict):
     """Создание чека"""
+    try:
+        data = documentation(f'statistics/{str(datetime.date.today())}.json')
+        client_counter = data["количество клиентов"]
+    except FileNotFoundError:
+        client_counter = 0
+
     os.chdir('bills')
     try:
         os.mkdir(str(datetime.date.today()))
@@ -45,10 +50,13 @@ def adding(production: dict):
     count_of_goods = int(input("Введите количество привезенных позиций товаров: "))
     for i in range(count_of_goods):
         name = input("Наименование товара: ")
-        quantity = int(input("Количество товара: "))
         if name in production:
+            quantity = int(input("Количество товара: "))
             production[name][2] += quantity
-    return production
+            with open("prods.json", "w") as f:
+                json.dump(production, f, ensure_ascii=False)
+        else:
+            print("Такого товара нет")
 
 
 def purchaice(production: dict):
@@ -76,9 +84,6 @@ def purchaice(production: dict):
 
 def prod(production: dict, balance: int):
     """Процесс оплаты товаров"""
-    global shop_balance
-    global client_counter
-
     bill, price = purchaice(production)
     if price > balance:
         print("У вас недостаточно денег.")
@@ -88,20 +93,33 @@ def prod(production: dict, balance: int):
         elif choice_again == 'нет':
             client(production)
     else:
+        try:
+            data = documentation(f'statistics/{str(datetime.date.today())}.json')
+            client_counter = data["количество клиентов"]
+            shop_balance = data["прибыль"]
+        except FileNotFoundError:
+            client_counter = 0
+            shop_balance = 0
+
+        # Внесение изменений в статистику кондитерской
+        client_counter += 1
+        shop_balance += price
+        stat = dict()
+        stat["количество клиентов"] = client_counter
+        stat["прибыль"] = shop_balance
+        stats(stat)
+
+        balance -= price
+
         print(f"Ваш чек:")
         for i, j in bill.items():
             print(i, j)
         bill_client(bill)
-        client_counter += 1
-        shop_balance += price
-        balance -= price
+
         with open("prods.json", "w") as f:
             json.dump(production, f, ensure_ascii=False)
-    stat = dict()
-    stat["количество клиентов"] = client_counter
-    stat["прибыль"] = shop_balance
-    stats(stat)
-    return  balance
+
+    return balance
 
 
 def client(production: dict):
@@ -139,42 +157,53 @@ def client(production: dict):
 
 def admin(production: dict):
     """Роль админа"""
-    print("""
+    while True:
+        print("""
 Выберите:
-1 - Для просмотра выручки;
+1 - Для просмотра выручки и количества клиентов за день;
 2 - Для изменения цены на товар;
 3 - Для добавления новой продукции в кондитерскую;
-4 - Для удаления продукции с кондитерской.
+4 - Для удаления продукции с кондитерской;
+5 - Для выхода.
 """)
-    admin_choice = input()
-    if admin_choice == '1':
-        print(f"Выручка магазина: {shop_balance}.")
-    elif admin_choice == '2':
-        good_choice = input("Введите название товара: ")
-        if good_choice in production:
-            price_choice = int(input("Введите новую цену на товар: "))
-            production[good_choice][1] = price_choice
-            print(production)
-    elif admin_choice == '3':
-        good_choice = input("Введите название товара: ")
-        if good_choice not in production:
-            sostav = input("Введите состав товара через запятую: ")
-            cost = int(input("Введите желаемую цену на товар: "))
 
-            production[good_choice] = [None, None, None]
-            production[good_choice][0] = sostav
-            production[good_choice][1] = cost
-            production[good_choice][2] = 0
-            print(production)
-    elif admin_choice == '4':
-        good_choice = input("Введите название товара: ")
-        if good_choice in production:
-            del production[good_choice]
-            print(production)
+        admin_choice = input()
+        if admin_choice == '1':
+            try:
+                data = documentation(f'statistics/{str(datetime.date.today())}.json')
+                client_counter = data["количество клиентов"]
+                shop_balance = data["прибыль"]
+            except FileNotFoundError:
+                client_counter = 0
+                shop_balance = 0
+            print(
+                f"Выручка магазина: {shop_balance}.\nКоличество клиентов за день: {client_counter}.")
+        elif admin_choice == '2':
+            good_choice = input("Введите название товара: ")
+            if good_choice in production:
+                price_choice = int(input("Введите новую цену на товар: "))
+                production[good_choice][1] = price_choice
+                print(production)
+        elif admin_choice == '3':
+            good_choice = input("Введите название товара: ")
+            if good_choice not in production:
+                sostav = input("Введите состав товара через запятую: ")
+                cost = int(input("Введите желаемую цену на товар: "))
+
+                production[good_choice] = [None, None, None]
+                production[good_choice][0] = sostav
+                production[good_choice][1] = cost
+                production[good_choice][2] = 0
+                print(production)
+        elif admin_choice == '4':
+            good_choice = input("Введите название товара: ")
+            if good_choice in production:
+                del production[good_choice]
+                print(production)
+        elif admin_choice == '5':
+            break
     with open("prods.json", "w") as f:
         json.dump(production, f, ensure_ascii=False)
-
-    return production
 
 
 def main(production: dict):
@@ -185,8 +214,8 @@ def main(production: dict):
     elif role_choice == 'администратор':
         admin(production)
     elif role_choice == 'покупатель':
+        print(production)
         client(production)
-    return shop_balance, client_counter
 
 
 while (time.time() - start_time) < max_time:
