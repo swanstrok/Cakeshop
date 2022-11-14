@@ -127,7 +127,7 @@ def client(production: dict):
     balance = random.randint(0, 5000)
     while True:
         print(f"""
-Мой баланс {balance}
+Мой баланс: {balance}
 Введите для выбора:
 1. Если хотите посмотреть описание;
 2. Если хотите посмотреть цену;
@@ -169,15 +169,19 @@ def admin(production: dict):
 
         admin_choice = input()
         if admin_choice == '1':
+            date = input("Укажите дату в формате (гггг-мм-дд): ")
             try:
-                data = documentation(f'statistics/{str(datetime.date.today())}.json')
+                data = documentation(f'statistics/{date}.json')
                 client_counter = data["количество клиентов"]
                 shop_balance = data["прибыль"]
             except FileNotFoundError:
                 client_counter = 0
                 shop_balance = 0
-            print(
+            if date <= str(datetime.date.today()):
+                print(
                 f"Выручка магазина: {shop_balance}.\nКоличество клиентов за день: {client_counter}.")
+            else:
+                print("Простите, введенная дата еще не наступила.")
         elif admin_choice == '2':
             good_choice = input("Введите название товара: ")
             if good_choice in production:
