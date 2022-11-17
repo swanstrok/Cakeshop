@@ -16,6 +16,37 @@ def documentation(filename: str):
     return production
 
 
+def registry():
+    """Регистрация нового постоянного клиента"""
+    os.chdir('clients')
+    try:
+        data = documentation('cake_clients.json')
+    except json.decoder.JSONDecodeError:
+        data = {}
+    print(data)
+
+    name = input("Введите ваше имя и фамилию: ")
+    if name in data:
+        print("Извините, пользователь с таким именем уже существует.")
+    else:
+        phone = input("Введите ваш номер телефона: ")
+        email = input("Введите ваш email: ")
+        information = {}
+        information["телефон"] = phone
+        information["email"] = email
+        information["количество посещений"] = 0
+        data[name] = information
+
+        with open('cake_clients.json', 'w') as f:
+            json.dump(data, f, ensure_ascii=False)
+        print("Регистрация успешно пройдена.")
+
+    os.chdir('..')
+
+
+# registry()
+
+
 def bill_client(bill: dict):
     """Создание чека"""
     try:
@@ -46,7 +77,7 @@ def stats(stat: dict):
 
 
 def adding(production: dict):
-    """Добавление продуктов в кондитерскую"""
+    """Добавление продуктов в кондитерскую. Поставка"""
     count_of_goods = int(input("Введите количество привезенных позиций товаров: "))
     for i in range(count_of_goods):
         name = input("Наименование товара: ")
@@ -85,6 +116,24 @@ def purchaice(production: dict):
 def prod(production: dict, balance: int):
     """Процесс оплаты товаров"""
     bill, price = purchaice(production)
+
+    cake_client = input("Есть ли у вас наша карта постоянного клиента? (д/н): ").lower()
+    if cake_client == 'д':
+        data = documentation('clients/cake_clients.json')
+        name = input("Введите ваше имя и фамилию: ")
+        if name in data:
+            pass
+        else:
+            print("Извините, но вас нет в списке наших постоянных клиентов.")
+    elif cake_client == 'н':
+        while True:
+            our_client_choice = input("Не желаете ли приобрести карту? (д/н): ")
+            if our_client_choice == 'д':
+                registry()
+                break
+            elif our_client_choice == 'н':
+                break
+
     if price > balance:
         print("У вас недостаточно денег.")
         choice_again = input("Хотите ли вы вернуться к покупкам?(да/нет)\n").lower()
@@ -129,7 +178,7 @@ def client(production: dict):
         print(f"""
 Мой баланс: {balance}
 Введите для выбора:
-1. Если хотите посмотреть описание;
+1. Если хотите посмотреть состав;
 2. Если хотите посмотреть цену;
 3. Если хотите посмотреть количество;
 4. Если хотите посмотреть всю информацию;
@@ -179,7 +228,7 @@ def admin(production: dict):
                 shop_balance = 0
             if date <= str(datetime.date.today()):
                 print(
-                f"Выручка магазина: {shop_balance}.\nКоличество клиентов за день: {client_counter}.")
+                    f"Выручка магазина: {shop_balance}.\nКоличество клиентов за день: {client_counter}.")
             else:
                 print("Простите, введенная дата еще не наступила.")
         elif admin_choice == '2':
@@ -220,7 +269,6 @@ def main(production: dict):
     elif role_choice == 'покупатель':
         print(production)
         client(production)
-
 
 while (time.time() - start_time) < max_time:
     main(documentation('prods.json'))
