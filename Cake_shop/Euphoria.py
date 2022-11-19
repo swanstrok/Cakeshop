@@ -23,19 +23,20 @@ def registry():
         data = documentation('cake_clients.json')
     except json.decoder.JSONDecodeError:
         data = {}
-    print(data)
 
-    name = input("Введите ваше имя и фамилию: ")
-    if name in data:
-        print("Извините, пользователь с таким именем уже существует.")
+    phone = input("Введите ваш номер телефона: ")
+    if phone in data:
+        print("Извините, пользователь с таким номером телефона уже существует.")
     else:
-        phone = input("Введите ваш номер телефона: ")
+        name = input("Введите ваше имя: ")
+        surname = input("Введите вашу фамилию: ")
         email = input("Введите ваш email: ")
         information = {}
-        information["телефон"] = phone
-        information["email"] = email
-        information["количество посещений"] = 0
-        data[name] = information
+        information["Имя"] = name
+        information["Фамилия"] = surname
+        information["Email"] = email
+        information["Количество посещений"] = 0
+        data[phone] = information
 
         with open('cake_clients.json', 'w') as f:
             json.dump(data, f, ensure_ascii=False)
@@ -213,7 +214,8 @@ def admin(production: dict):
 2 - Для изменения цены на товар;
 3 - Для добавления новой продукции в кондитерскую;
 4 - Для удаления продукции с кондитерской;
-5 - Для выхода.
+5 - Для просмотра списка постоянных клиентов;
+6 - Для выхода.
 """)
 
         admin_choice = input()
@@ -254,6 +256,14 @@ def admin(production: dict):
                 del production[good_choice]
                 print(production)
         elif admin_choice == '5':
+            os.chdir('clients')
+            try:
+                data = documentation('cake_clients.json')
+            except json.decoder.JSONDecodeError:
+                data = {}
+            for client, information in data.items():
+                print(client, ":", information)
+        elif admin_choice == '6':
             break
     with open("prods.json", "w") as f:
         json.dump(production, f, ensure_ascii=False)
