@@ -18,7 +18,7 @@ def cateter(production: dict) -> None:
                 quantity = int(input("Введите количество привезенного товара: "))
                 production[title][2] += quantity
                 with open(file='production.json', mode='w') as f:
-                    json.dump(production, f, ensure_ascii=True)
+                    json.dump(production, f, ensure_ascii=False)
             else:
                 print("Такой продукции в нашей кондитерской нет. Просим прощения.")
                 continue
