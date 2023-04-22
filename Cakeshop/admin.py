@@ -1,3 +1,6 @@
+from Euphoria import show_production
+
+
 def add_product(production: dict) -> dict:
     """Добавляет новый товар в продукцию кондитерской"""
     new_good_title = input("Введите название нового товара: ").capitalize()
@@ -46,10 +49,11 @@ def delete_good(production: dict) -> dict:
 def good_operations(production: dict) -> None:
     """Операции с продукцией"""
     good_operations_menu = """
-1 - Изменить цену на товар;
-2 - Добавить новый товар в кондитерскую;
-3 - Удалить товар из кондитерской;
-4 - Выйти в предыдущее меню.
+1 - Посмотреть продукцию кондитерской;
+2 - Изменить цену на товар;
+3 - Добавить новый товар в кондитерскую;
+4 - Удалить товар из кондитерской;
+5 - Выйти в предыдущее меню.
     """
 
     print(good_operations_menu)
@@ -57,15 +61,17 @@ def good_operations(production: dict) -> None:
     while True:
         admin_goods_choice = input("Ваш выбор: ").lower()
 
-        if admin_goods_choice == '1' or admin_goods_choice == 'изменить':
+        if admin_goods_choice == '1' or admin_goods_choice == 'посмотреть':
+            show_production(production)
+        elif admin_goods_choice == '2' or admin_goods_choice == 'изменить':
             change_price(production)
-        elif admin_goods_choice == '2' or admin_goods_choice == 'добавить':
+        elif admin_goods_choice == '3' or admin_goods_choice == 'добавить':
             add_product(production)
-        elif admin_goods_choice == '3' or admin_goods_choice == 'удалить':
+        elif admin_goods_choice == '4' or admin_goods_choice == 'удалить':
             delete_good(production)
         print(good_operations_menu)
 
-        if admin_goods_choice == '4' or admin_goods_choice == 'выйти':
+        if admin_goods_choice == '5' or admin_goods_choice == 'выйти':
             break
 
 
