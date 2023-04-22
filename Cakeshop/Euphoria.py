@@ -1,3 +1,14 @@
+import json
+
+
+def create_documentation(filename: str):
+    """Функция чтения документации из JSON и создания в объекте Python"""
+    with open(filename) as f:
+        documentation = json.load(f)
+
+    return documentation
+
+
 def main():
     print("""
 Добро пожаловать в кондитерскую!
