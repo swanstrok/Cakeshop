@@ -7,9 +7,6 @@ from client import *
 
 def documentation(filename: str) -> dict:
     """Функция чтения документации из JSON и создания в ее в виде словаря"""
-    # with open(filename) as f:
-    #     docs = json.load(f)
-
     try:
         file = open(file=filename, mode='r')
         docs = json.load(file)
@@ -18,7 +15,6 @@ def documentation(filename: str) -> dict:
         docs = {}
 
     file.close()
-
     return docs
 
 
@@ -59,6 +55,9 @@ def role_choice(production: dict) -> None:
         else:
             role_choiced = False
             print("Простите, такой роли в нашей кондитерской не предусмотрено.")
+
+        with open(file="production.json", mode="w") as f:  # Сохранение изменений продукции в файл
+            json.dump(production, f, ensure_ascii=False)
 
 
 def main(production: dict) -> None:

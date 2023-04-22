@@ -12,13 +12,11 @@ def cateter(production: dict) -> None:
         cateter_choice = input("Ваш выбор: ").lower()
 
         if cateter_choice == '1' or cateter_choice == 'поставить':
-            title = input("Введите название товара: ")
+            title = input("Введите название товара: ").capitalize()
 
             if title in production:
                 quantity = int(input("Введите количество привезенного товара: "))
                 production[title][2] += quantity
-                with open(file='production.json', mode='w') as f:
-                    json.dump(production, f, ensure_ascii=False)
             else:
                 print("Такой продукции в нашей кондитерской нет. Просим прощения.")
                 continue
