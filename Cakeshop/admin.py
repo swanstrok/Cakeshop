@@ -8,7 +8,7 @@ def add_product(production: dict) -> dict:
         production[new_good_title][0] = ingredients
         production[new_good_title][1] = price
         production[new_good_title][2] = 0
-        print(f'Товар {new_good_title} успешно добавлен в продукцию кондитерской.')
+        print(f'{new_good_title} успешно добавлен в продукцию кондитерской.')
     else:
         print('Такой товар уже есть в продукции кондитерской.')
 
@@ -22,7 +22,7 @@ def change_price(production: dict) -> dict:
     if good_title in production:
         new_price = int(input("Введите новую цену на товар: "))
         production[good_title][1] = new_price
-        print(f'Цена на {good_title} изменена на {new_price}.')
+        print(f'Цена на "{good_title}" изменена на {new_price}.')
 
     else:
         print('Товара с таким названием нет в нашей кондитерской.')
@@ -30,7 +30,20 @@ def change_price(production: dict) -> dict:
     return production
 
 
-def good_operations(production: dict):
+def delete_good(production: dict) -> dict:
+    """Удаляет товар из кондитерской"""
+    good_title = input("Введите название товара: ").capitalize()
+
+    if good_title in production:
+        del production[good_title]
+        print(f'{good_title} удален из продукции кондитерской.')
+    else:
+        print('Товара с таким названием нет в нашей кондитерской.')
+
+    return production
+
+
+def good_operations(production: dict) -> None:
     """Операции с продукцией"""
     good_operations_menu = """
 1 - Изменить цену на товар;
@@ -49,7 +62,7 @@ def good_operations(production: dict):
         elif admin_goods_choice == '2' or admin_goods_choice == 'добавить':
             add_product(production)
         elif admin_goods_choice == '3' or admin_goods_choice == 'удалить':
-            pass
+            delete_good(production)
         print(good_operations_menu)
 
         if admin_goods_choice == '4' or admin_goods_choice == 'выйти':
