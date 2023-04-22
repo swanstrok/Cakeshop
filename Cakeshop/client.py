@@ -70,8 +70,7 @@ def purchaise(production: dict, balance: int):
 
 def client(production: dict):
     """Приход клиента"""
-    # balance = random.randint(0, 5000)  # Генерирует случайный баланс клиента
-    balance = 100
+    balance = random.randint(0, 5000)  # Генерирует случайный баланс клиента
     while True:
         print(f"""
 Мой баланс: {balance}
