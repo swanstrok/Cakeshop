@@ -1,5 +1,9 @@
 import json
 
+from admin import *
+from cateter import cateter
+from client import *
+
 
 def documentation(filename: str) -> dict:
     """Функция чтения документации из JSON и создания в ее в виде словаря"""
@@ -16,70 +20,6 @@ def documentation(filename: str) -> dict:
     file.close()
 
     return docs
-
-
-def admin(production: dict) -> None:
-    """Роль админа"""
-    while True:
-        print("""
-Выберите:
-1 - Для просмотра выручки и количества клиентов за день;
-2 - Для изменения цены на товар;
-3 - Для добавления новой продукции в кондитерскую;
-4 - Для удаления продукции с кондитерской;
-5 - Для просмотра списка постоянных клиентов;
-6 - Для выхода.
-""")
-        admin_choice = input("Ваш выбор: ")
-
-        if admin_choice == '1':
-            pass
-
-        elif admin_choice == '2':
-            pass
-
-        elif admin_choice == '3':
-            pass
-
-        elif admin_choice == '4':
-            pass
-
-        elif admin_choice == '5':
-            pass
-
-        elif admin_choice == '6':
-            break
-
-
-def client(production: dict) -> None:
-    """Роль покупателя"""
-    pass
-
-
-def cateter(production: dict) -> None:
-    """Роль поставщика. Добавление продуктов в кондитерскую"""
-    while True:
-        print("""
-1 - Поставить продукцию в кондитерскую;
-2 - Выход.
-        """)
-
-        cateter_choice = input("Ваш выбор: ").lower()
-
-        if cateter_choice == '1' or cateter_choice == 'поставить':
-            title = input("Введите название товара: ")
-
-            if title in production:
-                quantity = int(input("Введите количество привезенного товара: "))
-                production[title][2] += quantity
-                with open(file='production.json', mode='w') as f:
-                    json.dump(production, f, ensure_ascii=True)
-            else:
-                print("Такой продукции в нашей кондитерской нет. Просим прощения.")
-                continue
-
-        elif cateter_choice == '2' or cateter_choice == 'выход':
-            break
 
 
 def role_choice(production: dict) -> None:
