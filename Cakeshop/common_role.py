@@ -1,9 +1,12 @@
 def show_production(production: dict) -> None:
     """Показывает продукцию кондитерской"""
-    for title, information in production.items():
-        print(f"""
+    if production:
+        for title in production.keys():
+            print(f"""
 Название: {title}
-Состав: {information[0]}
-Цена: {information[1]} руб.
-Остаток: {information[2]} шт.
+Состав: {production[title]['Состав']},
+Цена: {production[title]['Цена']} руб.
+Остаток: {production[title]['Остаток']} шт.
 """)
+    else:
+        print('Извините на данный момент вся продукция закончилась.')

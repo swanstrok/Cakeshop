@@ -3,9 +3,75 @@ import random
 from common_role import show_production
 
 
+def order_create(production: dict):
+    """Процесс формирования заказа"""
+    price = 0
+    order = dict()
+
+    while True:
+        good_title = input(
+            "Введите название товара, если ничего не желаете то введите 'N': ").capitalize()
+
+        if good_title == 'N':
+            break
+
+        elif good_title not in production:
+            print("У нас нет товара с таким названием.")
+            continue
+
+        quantity = int(input("Введите количество товара: "))
+
+        if quantity > production[good_title]['Остаток']:
+            print("Извините, но у нас нет такого количества.")
+            continue
+
+        cost = production[good_title]['Цена'] * quantity
+        order[good_title] = {
+            'Количество': quantity,
+            'Цена за 1 шт.': production[good_title]['Цена'],
+            'Итого': cost
+        }
+        price += cost
+
+    print(order)
+    return order, price
+
+
+def balance_check(balance: int, price: int):
+    """Проверка на наличие у покупателя нужной суммы денег"""
+    if price > balance:
+        print("У вас недостаточно денег.")
+        return False
+    else:
+        return True
+
+
+def purchaise(production: dict, balance: int):
+    """Процесс оплаты товаров"""
+    order, price = order_create(production)
+
+    if order:
+        purchaise_power = balance_check(balance=balance, price=price)
+
+        if not purchaise_power:
+            choice_again = input("Хотите ли вы вернуться к покупкам?(да/нет): ").lower()
+            if choice_again == 'да':
+                return purchaise(production, balance)
+            elif choice_again == 'нет':
+                return client(production)
+        else:
+            balance -= price
+            print(balance)
+            for good in order.keys():
+                production[good]['Остаток'] -= order[good]['Количество']
+
+    return balance
+
+
 def client(production: dict):
     """Приход клиента"""
-    balance = random.randint(0, 5000)  # Генерирует случайный баланс клиента
+    # balance = random.randint(0, 5000)  # Генерирует случайный баланс клиента
+    balance = 100
     while True:
         print(f"""
 Мой баланс: {balance}
@@ -14,11 +80,11 @@ def client(production: dict):
 2. Приступить к покупке;
 3. Выход.
 """)
-        choice = input("Введите свой выбор:\n").lower()
+        choice = input("Введите свой выбор: ").lower()
 
         if choice == "1":
             show_production(production)
         elif choice == "2":
-            pass
+            balance = purchaise(production, balance)
         elif choice == "3":
             break

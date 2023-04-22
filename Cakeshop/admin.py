@@ -7,10 +7,10 @@ def add_product(production: dict) -> dict:
     if new_good_title not in production:
         ingredients = input("Введите состав товара через запятую: ")
         price = int(input("Введите желаемую цену на товар: "))
-        production[new_good_title] = [None, None, None]
-        production[new_good_title][0] = ingredients
-        production[new_good_title][1] = price
-        production[new_good_title][2] = 0
+        production[new_good_title] = {'Состав': ingredients,
+                                      'Цена': price,
+                                      'Остаток': 0
+        }
         print(f'{new_good_title} успешно добавлен в продукцию кондитерской.')
     else:
         print('Такой товар уже есть в продукции кондитерской.')
@@ -23,9 +23,9 @@ def change_price(production: dict) -> dict:
     good_title = input("Введите название товара: ").capitalize()
 
     if good_title in production:
-        new_price = int(input("Введите новую цену на товар: "))
-        production[good_title][1] = new_price
-        print(f'Цена на "{good_title}" изменена на {new_price}.')
+        new_price = int(input("Введите новую цену на товар (руб): "))
+        production[good_title]['Цена'] = new_price
+        print(f'Цена на "{good_title}" изменена на {new_price} руб.')
 
     else:
         print('Товара с таким названием нет в нашей кондитерской.')
