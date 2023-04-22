@@ -1,15 +1,15 @@
 import json
 
 
-def create_documentation(filename: str):
-    """Функция чтения документации из JSON и создания в объекте Python"""
+def documentation(filename: str) -> dict:
+    """Функция чтения документации из JSON и создания в ее в виде словаря"""
     with open(filename) as f:
-        documentation = json.load(f)
+        docs = json.load(f)
 
-    return documentation
+    return docs
 
 
-def main():
+def main(production: dict):
     print("""
 Добро пожаловать в кондитерскую!
 
@@ -33,4 +33,9 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    try:
+        production = documentation('production.json')
+    except FileNotFoundError:
+        production = open(file='production.json', mode='w')
+        production.close()
+    main(production)
