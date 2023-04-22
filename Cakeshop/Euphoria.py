@@ -18,60 +18,115 @@ def documentation(filename: str) -> dict:
     return docs
 
 
-def admin(production: dict):
+def admin(production: dict) -> None:
     """Роль админа"""
-    pass
+    while True:
+        print("""
+Выберите:
+1 - Для просмотра выручки и количества клиентов за день;
+2 - Для изменения цены на товар;
+3 - Для добавления новой продукции в кондитерскую;
+4 - Для удаления продукции с кондитерской;
+5 - Для просмотра списка постоянных клиентов;
+6 - Для выхода.
+""")
+        admin_choice = input("Ваш выбор: ")
+
+        if admin_choice == '1':
+            pass
+
+        elif admin_choice == '2':
+            pass
+
+        elif admin_choice == '3':
+            pass
+
+        elif admin_choice == '4':
+            pass
+
+        elif admin_choice == '5':
+            pass
+
+        elif admin_choice == '6':
+            break
 
 
-def client(production: dict):
+def client(production: dict) -> None:
     """Роль покупателя"""
     pass
 
 
-def cateter(production: dict):
+def cateter(production: dict) -> None:
     """Роль поставщика. Добавление продуктов в кондитерскую"""
-    count_of_goods = int(input("Введите количество привезенных позиций товаров: "))
+    while True:
+        print("""
+1 - Поставить продукцию в кондитерскую;
+2 - Выход.
+        """)
 
-    for i in range(count_of_goods):
-        title = input("Введите название товара: ")
+        cateter_choice = input("Ваш выбор: ").lower()
 
-        if title in production:
-            quantity = int(input("Введите количество привезенного товара: "))
-            production[title][2] += quantity
-            with open(file='production.json', mode='w') as f:
-                json.dump(production, f, ensure_ascii=True)
-        else:
-            print("Такой продукции в нашей кондитерской нет. Просим прощения.")
-            continue
+        if cateter_choice == '1' or cateter_choice == 'поставить':
+            title = input("Введите название товара: ")
+
+            if title in production:
+                quantity = int(input("Введите количество привезенного товара: "))
+                production[title][2] += quantity
+                with open(file='production.json', mode='w') as f:
+                    json.dump(production, f, ensure_ascii=True)
+            else:
+                print("Такой продукции в нашей кондитерской нет. Просим прощения.")
+                continue
+
+        elif cateter_choice == '2' or cateter_choice == 'выход':
+            break
 
 
-def main(production: dict):
-    print("""
-Добро пожаловать в кондитерскую!
+def role_choice(production: dict) -> None:
+    """Функция выбора роли"""
+    role_choiced = False
 
+    while not role_choiced:
+        print("""
 Выберите свою роль:
-    
+        
 1 - Покупатель;
 2 - Администратор;
-3 - Поставщик
+3 - Поставщик;
+4 - Выход.
 """)
 
-    role_choice = input("Ваш выбор: ").lower()
+        role = input("Ваш выбор: ").lower()
 
-    if role_choice == '1' or role_choice == 'покупатель':
-        print('Привет, покупатель!')
-        client(production)
+        if role == '1' or role == 'покупатель':
+            role_choiced = True
+            print('Привет, покупатель!')
+            client(production)
 
-    elif role_choice == '2' or role_choice == 'администратор':
-        print('Привет, администратор!')
-        admin(production)
+        elif role == '2' or role == 'администратор':
+            role_choiced = True
+            print('Привет, администратор!')
+            admin(production)
 
-    elif role_choice == '3' or role_choice == 'поставщик':
-        print('Привет, поставщик!')
-        cateter(production)
+        elif role == '3' or role == 'поставщик':
+            role_choiced = True
+            print('Привет, поставщик!')
+            cateter(production)
 
-    print('\nДо свидания!')
+        elif role == '4' or role == 'выход':
+            break
+
+        else:
+            role_choiced = False
+            print("Простите, такой роли в нашей кондитерской не предусмотрено.")
+
+
+def main(production: dict) -> None:
+    print("Добро пожаловать в кондитерскую!")
+    role_choice(production)
+    print('До свидания!\n')
 
 
 if __name__ == '__main__':
-    main(documentation('production.json'))
+    while True:
+        main(documentation('production.json'))
