@@ -29,8 +29,20 @@ def client(production: dict):
 
 
 def cateter(production: dict):
-    """Роль поставщика"""
-    pass
+    """Роль поставщика. Добавление продуктов в кондитерскую"""
+    count_of_goods = int(input("Введите количество привезенных позиций товаров: "))
+
+    for i in range(count_of_goods):
+        title = input("Введите название товара: ")
+
+        if title in production:
+            quantity = int(input("Введите количество привезенного товара: "))
+            production[title][2] += quantity
+            with open(file='production.json', mode='w') as f:
+                json.dump(production, f, ensure_ascii=True)
+        else:
+            print("Такой продукции в нашей кондитерской нет. Просим прощения.")
+            continue
 
 
 def main(production: dict):
@@ -57,6 +69,8 @@ def main(production: dict):
     elif role_choice == '3' or role_choice == 'поставщик':
         print('Привет, поставщик!')
         cateter(production)
+
+    print('\nДо свидания!')
 
 
 if __name__ == '__main__':
