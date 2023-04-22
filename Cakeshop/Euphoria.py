@@ -1,8 +1,8 @@
 import json
 
-from admin import *
+from admin import admin
 from cateter import cateter
-from client import *
+from client import client
 
 
 def documentation(filename: str) -> dict:
@@ -16,17 +16,6 @@ def documentation(filename: str) -> dict:
 
     file.close()
     return docs
-
-
-def show_production(production: dict):
-    """Показывает продукцию кондитерской"""
-    for title, information in production.items():
-        print(f"""
-Название: {title}
-Состав: {information[0]}
-Цена: {information[1]} руб.
-Остаток: {information[2]} шт.
-""")
 
 
 def role_choice(production: dict) -> None:

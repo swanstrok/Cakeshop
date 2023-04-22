@@ -1,4 +1,4 @@
-from Euphoria import show_production
+from common_role import show_production
 
 
 def add_product(production: dict) -> dict:
