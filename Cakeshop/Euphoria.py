@@ -1,21 +1,31 @@
+import datetime
 import json
+import os
 
-from admin import admin
-from cateter import cateter
-from client import client
+import admin
+import cateter
+import client
+import common_role
+
+def push_statistic(stat: dict) -> None:
+    """Загрузка статистики прибыли и количества клиентов за день в файл"""
+    os.chdir('statistics')
+    with open(file=f'{str(datetime.date.today())}.json', mode='w') as f:
+        json.dump(stat, f, ensure_ascii=False)
+    os.chdir('..')
 
 
-def documentation(filename: str) -> dict:
-    """Функция чтения документации из JSON и создания в ее в виде словаря"""
-    try:
-        file = open(file=filename, mode='r')
-        docs = json.load(file)
-    except (FileNotFoundError, json.decoder.JSONDecodeError):
-        file = open(file=filename, mode='w')
-        docs = {}
 
-    file.close()
-    return docs
+
+
+def create_statistic(price: int) -> None:
+    """Создание статистики"""
+    client_counter, shop_balance = common_role.load_statistic(str(datetime.date.today()))
+    # Внесение изменений в статистику кондитерской
+    stat = dict()
+    stat["количество клиентов"] = client_counter + 1
+    stat["прибыль"] = shop_balance + price
+    push_statistic(stat)
 
 
 def role_choice(production: dict) -> None:
@@ -36,18 +46,15 @@ def role_choice(production: dict) -> None:
 
         if role == '1' or role == 'покупатель':
             role_choiced = True
-            print('Привет, покупатель!')
-            client(production)
+            client.client(production)
 
         elif role == '2' or role == 'администратор':
             role_choiced = True
-            print('Привет, администратор!')
-            admin(production)
+            admin.admin(production)
 
         elif role == '3' or role == 'поставщик':
             role_choiced = True
-            print('Привет, поставщик!')
-            cateter(production)
+            cateter.cateter(production)
 
         elif role == '4' or role == 'выход':
             break
@@ -68,4 +75,4 @@ def main(production: dict) -> None:
 
 if __name__ == '__main__':
     while True:
-        main(documentation('production.json'))
+        main(common_role.documentation('production.json'))

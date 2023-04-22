@@ -1,4 +1,19 @@
-from common_role import show_production
+import datetime
+
+from common_role import show_production, load_statistic
+
+
+def get_statistic():
+    """Показывает выручку и количество посетителей за выбранный день"""
+    date = input("Укажите дату в формате (гггг-мм-дд): ")
+
+    if date <= str(datetime.date.today()):
+        client_counter, shop_balance = load_statistic(date)
+        print(
+            f"Выручка магазина: {shop_balance}.\n"
+            f"Количество клиентов за день: {client_counter}.")
+    else:
+        print("Простите, введенная дата еще не наступила.")
 
 
 def add_product(production: dict) -> dict:
@@ -88,7 +103,7 @@ def admin(production: dict) -> None:
         admin_choice = input("Ваш выбор: ")
 
         if admin_choice == '1':
-            pass
+            get_statistic()
 
         elif admin_choice == '2':
             good_operations(production)

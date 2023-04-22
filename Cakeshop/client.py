@@ -1,6 +1,7 @@
 import random
 
 from common_role import show_production
+from Euphoria import create_statistic
 
 
 def order_create(production: dict):
@@ -10,9 +11,9 @@ def order_create(production: dict):
 
     while True:
         good_title = input(
-            "Введите название товара, если ничего не желаете то введите 'N': ").capitalize()
+            "Введите название товара, если ничего не желаете то введите '-': ").capitalize()
 
-        if good_title == 'N':
+        if good_title == '-':
             break
 
         elif good_title not in production:
@@ -33,11 +34,10 @@ def order_create(production: dict):
         }
         price += cost
 
-    print(order)
     return order, price
 
 
-def balance_check(balance: int, price: int):
+def balance_check(balance: int, price: int) -> bool:
     """Проверка на наличие у покупателя нужной суммы денег"""
     if price > balance:
         print("У вас недостаточно денег.")
@@ -46,30 +46,30 @@ def balance_check(balance: int, price: int):
         return True
 
 
-def purchaise(production: dict, balance: int):
+def purchaise(production: dict, balance: int, costs: int):
     """Процесс оплаты товаров"""
     order, price = order_create(production)
 
     if order:
-        purchaise_power = balance_check(balance=balance, price=price)
-
-        if not purchaise_power:
-            choice_again = input("Хотите ли вы вернуться к покупкам?(да/нет): ").lower()
-            if choice_again == 'да':
-                return purchaise(production, balance)
-            elif choice_again == 'нет':
-                return client(production)
-        else:
+        if balance_check(balance, price):
             balance -= price
-            print(balance)
+            costs += price
             for good in order.keys():
                 production[good]['Остаток'] -= order[good]['Количество']
 
-    return balance
+        else:
+            choice_again = input("Хотите ли вы вернуться к покупкам?(да/нет): ").lower()
+            if choice_again == 'да':
+                return purchaise(production, balance, costs)
+            elif choice_again == 'нет':
+                return client(production)
+
+    return balance, costs
 
 
-def client(production: dict):
+def client(production: dict) -> None:
     """Приход клиента"""
+    costs = 0
     balance = random.randint(0, 5000)  # Генерирует случайный баланс клиента
     while True:
         print(f"""
@@ -84,6 +84,8 @@ def client(production: dict):
         if choice == "1":
             show_production(production)
         elif choice == "2":
-            balance = purchaise(production, balance)
+            balance, costs = purchaise(production, balance, costs)
         elif choice == "3":
+            if costs:
+                create_statistic(costs)
             break

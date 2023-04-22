@@ -1,6 +1,3 @@
-import json
-
-
 def cateter(production: dict) -> None:
     """Роль поставщика. Добавление продуктов в кондитерскую"""
     while True:
