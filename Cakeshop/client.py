@@ -1,42 +1,80 @@
 import json
-import os
 import random
 
-from file_functions import show_production, create_statistic, documentation
+from file_functions import show_production, create_statistic, documentation, load_client_purchases
 
 
-def registry():
-    """Регистрация нового постоянного клиента"""
-    os.chdir('clients')
-    data = documentation('Euphoria_clients.json')
-    phone = input("Введите ваш номер телефона: ")
-
+def authentication(phone: str, data) -> bool:
+    """Аутентификация пользователя"""
     if phone in data:
-        print("Извините, пользователь с таким номером телефона уже существует.")
+        return True
+    return False
 
-    else:
-        name = input("Введите ваше имя: ")
-        surname = input("Введите вашу фамилию: ")
-        email = input("Введите ваш email: ")
-        information = dict()
-        information["Имя"] = name
-        information["Фамилия"] = surname
-        information["Email"] = email
-        information["Сумма покупок"] = 0
-        data[phone] = information
 
-        with open('cake_clients.json', 'w') as f:
-            json.dump(data, f, ensure_ascii=False)
+def registration(phone, data):
+    """Регистрация нового постоянного клиента"""
+    name = input("Введите ваше имя: ")
+    surname = input("Введите вашу фамилию: ")
+    email = input("Введите ваш email: ")
+    information = dict()
+    information["Имя"] = name
+    information["Фамилия"] = surname
+    information["Email"] = email
+    information["Сумма покупок"] = 0
+    data[phone] = information
 
-        print("Регистрация успешно пройдена.")
+    with open('clients/Euphoria_clients.json', 'w') as f:
+        json.dump(data, f, ensure_ascii=False)
 
-    os.chdir('..')
+    print("Регистрация успешно пройдена.")
+    return phone
+
+
+def non_authorized_offer(data):
+    """Предложение для неавторизованных пользователей стать постоянным клиентом"""
+    while True:
+        our_client_choice = input("Не желаете ли приобрести карту? (д/н): ")
+        if our_client_choice == 'д':
+            phone = input("Введите ваш номер телефона: ")
+            if authentication(phone, data):
+                print("Извините пользователь с таким номером телефона уже существует.")
+                return authorization()
+            return registration(phone, data)
+        elif our_client_choice == 'н':
+            return None
+
+
+def authorization() -> tuple:
+    """Авторизируем пользователя"""
+    discount = 0
+    phone = None
+    data = documentation('clients/Euphoria_clients.json')
+    euphoria_client = input("Есть ли у вас наша карта постоянного клиента? (д/н): ").lower()
+
+    if euphoria_client == 'д':
+        phone = input("Введите ваш номер телефона: ")
+
+        if authentication(phone, data):
+            sum_of_purchaises = data[phone]["Сумма покупок"]
+            if sum_of_purchaises >= 10000:
+                discount = 0.3
+            elif sum_of_purchaises >= 5000:
+                discount = 0.15
+
+        else:
+            print("Извините, но вас нет в списке наших постоянных клиентов.")
+            phone = non_authorized_offer(data)
+    elif euphoria_client == 'н':
+        phone = non_authorized_offer(data)
+
+    return discount, phone
 
 
 def order_create(production: dict):
     """Процесс формирования заказа"""
     price = 0
     order = dict()
+    discount, phone = authorization()
 
     while True:
         good_title = input(
@@ -55,15 +93,16 @@ def order_create(production: dict):
             print("Извините, но у нас нет такого количества.")
             continue
 
-        cost = production[good_title]['Цена'] * quantity
+        cost = production[good_title]['Цена'] * quantity * (1 - discount)
         order[good_title] = {
             'Количество': quantity,
             'Цена за 1 шт.': production[good_title]['Цена'],
-            'Итого': cost
+            'Скидка': f'{discount * 100}%',
+            'Общая стоимость:': cost
         }
         price += cost
-
-    return order, price
+        print(order)
+    return order, price, phone
 
 
 def balance_check(balance: int, price: int) -> bool:
@@ -75,9 +114,11 @@ def balance_check(balance: int, price: int) -> bool:
         return True
 
 
+
+
 def purchaise(production: dict, balance: int, costs: int):
     """Процесс оплаты товаров"""
-    order, price = order_create(production)
+    order, price, phone = order_create(production)
 
     if order:
         if balance_check(balance, price):
@@ -85,6 +126,9 @@ def purchaise(production: dict, balance: int, costs: int):
             costs += price
             for good in order.keys():
                 production[good]['Остаток'] -= order[good]['Количество']
+
+            if phone is not None:
+                load_client_purchases(phone, costs)
 
         else:
             choice_again = input("Хотите ли вы вернуться к покупкам?(да/нет): ").lower()

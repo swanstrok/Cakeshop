@@ -59,3 +59,11 @@ def create_statistic(price: int) -> None:
     stat["количество клиентов"] = client_counter + 1
     stat["прибыль"] = shop_balance + price
     push_statistic(stat)
+
+
+def load_client_purchases(phone, price):
+    data = documentation('clients/Euphoria_clients.json')
+    data[phone]['Сумма покупок'] += price
+
+    with open(file='clients/Euphoria_clients.json', mode='w') as f:
+        json.dump(data, f, ensure_ascii=False)
