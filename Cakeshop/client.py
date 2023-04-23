@@ -1,6 +1,36 @@
+import json
+import os
 import random
 
-from file_functions import show_production, create_statistic
+from file_functions import show_production, create_statistic, documentation
+
+
+def registry():
+    """Регистрация нового постоянного клиента"""
+    os.chdir('clients')
+    data = documentation('Euphoria_clients.json')
+    phone = input("Введите ваш номер телефона: ")
+
+    if phone in data:
+        print("Извините, пользователь с таким номером телефона уже существует.")
+
+    else:
+        name = input("Введите ваше имя: ")
+        surname = input("Введите вашу фамилию: ")
+        email = input("Введите ваш email: ")
+        information = dict()
+        information["Имя"] = name
+        information["Фамилия"] = surname
+        information["Email"] = email
+        information["Сумма покупок"] = 0
+        data[phone] = information
+
+        with open('cake_clients.json', 'w') as f:
+            json.dump(data, f, ensure_ascii=False)
+
+        print("Регистрация успешно пройдена.")
+
+    os.chdir('..')
 
 
 def order_create(production: dict):

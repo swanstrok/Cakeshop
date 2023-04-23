@@ -162,3 +162,4 @@ cython_debug/
 # Cakeshop
 production.json
 statistics/
+clients/
