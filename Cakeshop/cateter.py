@@ -14,6 +14,7 @@ def cateter(production: dict) -> None:
             if title in production:
                 quantity = int(input("Введите количество привезенного товара: "))
                 production[title]['Остаток'] += quantity
+                print(f'{title} в количестве {quantity} шт. успешно добавлен в кондитерскую.')
             else:
                 print("Такой продукции в нашей кондитерской нет. Просим прощения.")
                 continue

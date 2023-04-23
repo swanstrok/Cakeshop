@@ -1,4 +1,6 @@
+import datetime
 import json
+import os
 
 
 def documentation(filename: str) -> dict:
@@ -39,3 +41,21 @@ def load_statistic(date):
         shop_balance = 0
 
     return client_counter, shop_balance
+
+
+def push_statistic(stat: dict) -> None:
+    """Загрузка статистики прибыли и количества клиентов за день в файл"""
+    os.chdir('statistics')
+    with open(file=f'{str(datetime.date.today())}.json', mode='w') as f:
+        json.dump(stat, f, ensure_ascii=False)
+    os.chdir('..')
+
+
+def create_statistic(price: int) -> None:
+    """Создание статистики"""
+    client_counter, shop_balance = load_statistic(str(datetime.date.today()))
+    # Внесение изменений в статистику кондитерской
+    stat = dict()
+    stat["количество клиентов"] = client_counter + 1
+    stat["прибыль"] = shop_balance + price
+    push_statistic(stat)

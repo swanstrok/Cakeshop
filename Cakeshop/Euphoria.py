@@ -2,30 +2,10 @@ import datetime
 import json
 import os
 
-import admin
-import cateter
-import client
-import common_role
-
-def push_statistic(stat: dict) -> None:
-    """Загрузка статистики прибыли и количества клиентов за день в файл"""
-    os.chdir('statistics')
-    with open(file=f'{str(datetime.date.today())}.json', mode='w') as f:
-        json.dump(stat, f, ensure_ascii=False)
-    os.chdir('..')
-
-
-
-
-
-def create_statistic(price: int) -> None:
-    """Создание статистики"""
-    client_counter, shop_balance = common_role.load_statistic(str(datetime.date.today()))
-    # Внесение изменений в статистику кондитерской
-    stat = dict()
-    stat["количество клиентов"] = client_counter + 1
-    stat["прибыль"] = shop_balance + price
-    push_statistic(stat)
+from admin import admin
+from cateter import cateter
+from client import client
+from file_functions import documentation
 
 
 def role_choice(production: dict) -> None:
@@ -46,15 +26,15 @@ def role_choice(production: dict) -> None:
 
         if role == '1' or role == 'покупатель':
             role_choiced = True
-            client.client(production)
+            client(production)
 
         elif role == '2' or role == 'администратор':
             role_choiced = True
-            admin.admin(production)
+            admin(production)
 
         elif role == '3' or role == 'поставщик':
             role_choiced = True
-            cateter.cateter(production)
+            cateter(production)
 
         elif role == '4' or role == 'выход':
             break
@@ -75,4 +55,4 @@ def main(production: dict) -> None:
 
 if __name__ == '__main__':
     while True:
-        main(common_role.documentation('production.json'))
+        main(documentation('production.json'))

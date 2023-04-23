@@ -1,7 +1,6 @@
 import random
 
-from common_role import show_production
-from Euphoria import create_statistic
+from file_functions import show_production, create_statistic
 
 
 def order_create(production: dict):
