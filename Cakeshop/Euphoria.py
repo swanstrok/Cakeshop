@@ -1,6 +1,4 @@
-import datetime
 import json
-import os
 
 from admin import admin
 from cateter import cateter
