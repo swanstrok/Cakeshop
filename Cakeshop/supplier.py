@@ -1,4 +1,4 @@
-def cateter(production: dict) -> None:
+def supplier(production: dict) -> None:
     """Роль поставщика. Добавление продуктов в кондитерскую"""
     while True:
         print("""
@@ -6,9 +6,9 @@ def cateter(production: dict) -> None:
 2 - Выход.
         """)
 
-        cateter_choice = input("Ваш выбор: ").lower()
+        supplier_choice = input("Ваш выбор: ").lower()
 
-        if cateter_choice == '1' or cateter_choice == 'поставить':
+        if supplier_choice == '1' or supplier_choice == 'поставить':
             title = input("Введите название товара: ").capitalize()
 
             if title in production:
@@ -19,5 +19,5 @@ def cateter(production: dict) -> None:
                 print("Такой продукции в нашей кондитерской нет. Просим прощения.")
                 continue
 
-        elif cateter_choice == '2' or cateter_choice == 'выход':
+        elif supplier_choice == '2' or supplier_choice == 'выход':
             break

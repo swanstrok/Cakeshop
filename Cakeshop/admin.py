@@ -1,6 +1,6 @@
 import datetime
 
-from file_functions import show_production, load_statistic
+from file_functions import show_production, load_statistic, documentation
 
 
 def get_statistic():
@@ -16,6 +16,24 @@ def get_statistic():
         print("Простите, введенная дата еще не наступила.")
 
 
+def get_clientlist() -> None:
+    """Показывает список постоянных клиентов"""
+    data = documentation('clients/Euphoria_clients.json')
+    if data:
+        print("СПИСОК ПОСТОЯННЫХ КЛИЕНТОВ")
+        for number, client in enumerate(data.keys()):
+            print(f"""
+№ {number + 1}
+Имя: {data[client]['Имя']}
+Фамилия: {data[client]['Фамилия']}
+Email: {data[client]['Email']}
+Телефон: {client}
+Сумма покупок: {data[client]['Сумма покупок']} руб.
+            """)
+    else:
+        print("В данный момент список клиентов пуст.")
+
+
 def add_product(production: dict) -> dict:
     """Добавляет новый товар в продукцию кондитерской"""
     new_good_title = input("Введите название нового товара: ").capitalize()
@@ -25,7 +43,7 @@ def add_product(production: dict) -> dict:
         production[new_good_title] = {'Состав': ingredients,
                                       'Цена': price,
                                       'Остаток': 0
-        }
+                                      }
         print(f'{new_good_title} успешно добавлен в продукцию кондитерской.')
     else:
         print('Такой товар уже есть в продукции кондитерской.')
@@ -109,7 +127,7 @@ def admin(production: dict) -> None:
             good_operations(production)
 
         elif admin_choice == '3':
-            pass
+            get_clientlist()
 
         elif admin_choice == '4':
             break

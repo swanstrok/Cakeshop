@@ -1,7 +1,7 @@
 import json
 
 from admin import admin
-from cateter import cateter
+from supplier import supplier
 from client import client
 from file_functions import documentation
 
@@ -32,7 +32,7 @@ def role_choice(production: dict) -> None:
 
         elif role == '3' or role == 'поставщик':
             role_choiced = True
-            cateter(production)
+            supplier(production)
 
         elif role == '4' or role == 'выход':
             break

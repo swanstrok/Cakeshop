@@ -1,8 +1,8 @@
 import json
 import random
 
-from file_functions import show_production, create_statistic, documentation, load_client_purchases, \
-    load_bill
+from file_functions import show_production, create_statistic, documentation, \
+    load_client_purchases, load_bill
 
 
 def authentication(phone: str, data) -> bool:
@@ -119,6 +119,22 @@ def balance_check(balance: int, price: int) -> bool:
         return True
 
 
+def print_bill(bill: dict) -> None:
+    """Выводит клиенту его чек"""
+    print("ВАШ ЧЕК")
+    for good in bill:
+        if good == 'Итого':
+            print(f'{good}: {bill[good]} руб.')
+        else:
+            print(f"""
+{good}
+Количество: {bill[good]['Количество']} шт.
+Цена за 1 шт.: {bill[good]['Цена за 1 шт.']} руб.
+Скидка: {bill[good]['Скидка']}
+Общая стоимость: {bill[good]['Общая стоимость']} руб.
+            """)
+
+
 def purchaise(production: dict, balance: int, costs: int):
     """Процесс оплаты товаров"""
     order, price, phone = order_create(production)
@@ -133,6 +149,7 @@ def purchaise(production: dict, balance: int, costs: int):
                 total_cost += order[good]['Общая стоимость']
             bill = order.copy()
             bill['Итого'] = total_cost
+            print_bill(bill)
             load_bill(bill)
 
             if phone is not None:
