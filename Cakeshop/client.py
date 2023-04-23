@@ -1,7 +1,8 @@
 import json
 import random
 
-from file_functions import show_production, create_statistic, documentation, load_client_purchases
+from file_functions import show_production, create_statistic, documentation, load_client_purchases, \
+    load_bill
 
 
 def authentication(phone: str, data) -> bool:
@@ -49,23 +50,27 @@ def authorization() -> tuple:
     discount = 0
     phone = None
     data = documentation('clients/Euphoria_clients.json')
-    euphoria_client = input("Есть ли у вас наша карта постоянного клиента? (д/н): ").lower()
+    authorization_choice_flag = False
 
-    if euphoria_client == 'д':
-        phone = input("Введите ваш номер телефона: ")
+    while not authorization_choice_flag:
+        euphoria_client = input("Есть ли у вас наша карта постоянного клиента? (д/н): ").lower()
+        if euphoria_client == 'д':
+            authorization_choice_flag = True
+            phone = input("Введите ваш номер телефона: ")
 
-        if authentication(phone, data):
-            sum_of_purchaises = data[phone]["Сумма покупок"]
-            if sum_of_purchaises >= 10000:
-                discount = 0.3
-            elif sum_of_purchaises >= 5000:
-                discount = 0.15
+            if authentication(phone, data):
+                sum_of_purchaises = data[phone]["Сумма покупок"]
+                if sum_of_purchaises >= 10000:
+                    discount = 0.3
+                elif sum_of_purchaises >= 5000:
+                    discount = 0.15
 
-        else:
-            print("Извините, но вас нет в списке наших постоянных клиентов.")
+            else:
+                print("Извините, но вас нет в списке наших постоянных клиентов.")
+                phone = non_authorized_offer(data)
+        elif euphoria_client == 'н':
+            authorization_choice_flag = True
             phone = non_authorized_offer(data)
-    elif euphoria_client == 'н':
-        phone = non_authorized_offer(data)
 
     return discount, phone
 
@@ -98,7 +103,7 @@ def order_create(production: dict):
             'Количество': quantity,
             'Цена за 1 шт.': production[good_title]['Цена'],
             'Скидка': f'{discount * 100}%',
-            'Общая стоимость:': cost
+            'Общая стоимость': cost
         }
         price += cost
         print(order)
@@ -114,8 +119,6 @@ def balance_check(balance: int, price: int) -> bool:
         return True
 
 
-
-
 def purchaise(production: dict, balance: int, costs: int):
     """Процесс оплаты товаров"""
     order, price, phone = order_create(production)
@@ -124,8 +127,13 @@ def purchaise(production: dict, balance: int, costs: int):
         if balance_check(balance, price):
             balance -= price
             costs += price
+            total_cost = 0
             for good in order.keys():
                 production[good]['Остаток'] -= order[good]['Количество']
+                total_cost += order[good]['Общая стоимость']
+            bill = order.copy()
+            bill['Итого'] = total_cost
+            load_bill(bill)
 
             if phone is not None:
                 load_client_purchases(phone, costs)

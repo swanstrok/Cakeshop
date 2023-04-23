@@ -62,8 +62,28 @@ def create_statistic(price: int) -> None:
 
 
 def load_client_purchases(phone, price):
+    """Загружает сумму покупок в данные о покупках клиента"""
     data = documentation('clients/Euphoria_clients.json')
     data[phone]['Сумма покупок'] += price
 
     with open(file='clients/Euphoria_clients.json', mode='w') as f:
         json.dump(data, f, ensure_ascii=False)
+
+
+def load_bill(bill: dict):
+    """Загружает чек в файл"""
+    date = str(datetime.date.today())
+    client_counter = load_statistic(date)[0]
+    os.chdir('bills')
+    try:
+        os.mkdir(date)
+    except FileExistsError:
+        pass
+    os.chdir(date)
+
+    with open(f'check №{client_counter}.json', 'w') as f:
+        json.dump(bill, f, ensure_ascii=False)
+    os.chdir('..')
+    os.chdir('..')
+
+
